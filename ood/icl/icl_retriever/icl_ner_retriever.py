@@ -27,8 +27,7 @@ class NerBERTRetriever(BaseRetriever):
                  test_split: Optional[str] = 'test',
                  accelerator: Optional[Accelerator] = None,
                  model_name: Optional[str] = 'bert-base-uncased') -> None:
-                 # model_name: Optional[str] = "/root/autodl-fs/google/gemma-2-2b") -> None:
-                 # model_name: Optional[str] = '/root/autodl-fs/sentence-transformer/all-mpnet-base-v2') -> None:
+                
         super().__init__(dataset_reader, ice_separator, ice_eos_token, prompt_eos_token, ice_num, index_split,
                          test_split, accelerator)
 
@@ -92,23 +91,23 @@ class NerBERTRetriever(BaseRetriever):
             'embeddings': embeddings_tensor,  # 整个数据集的嵌入张量
             'indices': all_indices  # 对应的原始索引
         }
-    #
-    # def retrieve(self) -> List[List]:
-    #     rtr_idx_list = []
-    #     logger.info("Randomly selecting data for test set...")
-    #
-    #     for idx in trange(len(self.test_corpus), disable=not self.is_main_process):
-    #         # 获取所有候选样本的全局索引
-    #         all_indices = self.index_corpus['indices']  # 假设这是所有候选样本的索引列表
-    #
-    #         # 随机选择9个（如果候选不足9个则全选）
-    #         num_samples = min(self.ice_num, len(all_indices))
-    #         selected_indices = random.sample(all_indices, num_samples) if len(
-    #             all_indices) >= num_samples else all_indices
-    #
-    #         rtr_idx_list.append(selected_indices)
-    #
-    #     return rtr_idx_list
+    
+    def retrieve_random(self) -> List[List]:
+        rtr_idx_list = []
+        logger.info("Randomly selecting data for test set...")
+    
+        for idx in trange(len(self.test_corpus), disable=not self.is_main_process):
+            # 获取所有候选样本的全局索引
+            all_indices = self.index_corpus['indices']  # 假设这是所有候选样本的索引列表
+    
+            # 随机选择9个（如果候选不足9个则全选）
+            num_samples = min(self.ice_num, len(all_indices))
+            selected_indices = random.sample(all_indices, num_samples) if len(
+                all_indices) >= num_samples else all_indices
+    
+            rtr_idx_list.append(selected_indices)
+    
+        return rtr_idx_list
 # 使用相似度检索
     def retrieve(self) -> List[List]:
         rtr_idx_list = []
@@ -133,4 +132,5 @@ class NerBERTRetriever(BaseRetriever):
             rtr_idx_list.append(global_indices)
 
         return rtr_idx_list
+
 
