@@ -142,65 +142,27 @@ class ColBERTRetriever(BaseRetriever):
         return rtr_idx_list
 
 #随机+采样
-    # def retrieve(self) -> List[List]:
-    #     rtr_idx_list = []
-    #     logger.info("Randomly selecting data for test set...")
-    #
-    #     # 遍历测试集
-    #     for idx in trange(len(self.test_corpus), disable=not self.is_main_process):
-    #         # 按标签分组随机选择
-    #         all_indices = []
-    #         for label in self.index_corpus['embeddings']:
-    #             label_indices = self.index_corpus['indices'][label]
-    #
-    #             # 随机选择 ice_num 个索引（如果该标签下的索引数足够）
-    #             random_indices = random.sample(label_indices, min(int(self.ice_num/3), len(label_indices)))
-    #             all_indices.extend(random_indices)
-    #
-    #         # 打乱选择的索引，保证返回结果的随机性
-    #         random.shuffle(all_indices)
-    #
-    #         # 只选择最相关的 ice_num 个
-    #         final_indices = all_indices[:self.ice_num]
-    #         rtr_idx_list.append(final_indices)
-    #
-    #     return rtr_idx_list
-
-#解释的相似度
-    # def retrieve(self) -> List[List]:
-    #     rtr_idx_list = []
-    #     logger.info("Retrieving data based on explanation similarity...")
-    #
-    #     # 遍历测试集
-    #     for idx in trange(len(self.test_corpus), disable=not self.is_main_process):
-    #         # 获取查询的 explanation
-    #         explanation = self.test_ds[idx]['explanation']
-    #
-    #         # 获取该查询的 explanation 嵌入
-    #         query_embedding = self._get_embedding(explanation)
-    #
-    #         # 按标签分组检索
-    #         all_scores, all_indices = [], []
-    #         for label in self.index_corpus['embeddings']:
-    #             label_emb = self.index_corpus['embeddings'][label]
-    #             similarity = self._compute_cosine_similarity(query_embedding, label_emb)
-    #
-    #             print(similarity)
-    #
-    #             # 按照相似度取 top-k 个索引
-    #             local_indices = similarity.topk(min(int(self.ice_num / 3), len(label_emb))).indices
-    #             global_indices = [self.index_corpus['indices'][label][i] for i in local_indices]
-    #
-    #             all_scores.extend(similarity[local_indices].tolist())
-    #             all_indices.extend(global_indices)
-    #
-    #         # 将所有相似度得分和索引按相似度降序排序
-    #         sorted_pairs = sorted(zip(all_scores, all_indices), reverse=True, key=lambda x: x[0])
-    #
-    #         # 取前 ice_num 个最相关的索引
-    #         final_indices = [idx for _, idx in sorted_pairs[:self.ice_num]]
-    #         rtr_idx_list.append(final_indices)
-    #
-    #     return rtr_idx_list
-
+    def retrieve_random(self) -> List[List]:
+        rtr_idx_list = []
+        logger.info("Randomly selecting data for test set...")
+    
+        # 遍历测试集
+        for idx in trange(len(self.test_corpus), disable=not self.is_main_process):
+            # 按标签分组随机选择
+            all_indices = []
+            for label in self.index_corpus['embeddings']:
+                label_indices = self.index_corpus['indices'][label]
+    
+                # 随机选择 ice_num 个索引（如果该标签下的索引数足够）
+                random_indices = random.sample(label_indices, min(int(self.ice_num/3), len(label_indices)))
+                all_indices.extend(random_indices)
+    
+            # 打乱选择的索引，保证返回结果的随机性
+            random.shuffle(all_indices)
+    
+            # 只选择最相关的 ice_num 个
+            final_indices = all_indices[:self.ice_num]
+            rtr_idx_list.append(final_indices)
+    
+        return rtr_idx_list
 
