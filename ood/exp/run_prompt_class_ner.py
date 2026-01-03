@@ -92,7 +92,7 @@ def main(train_path, test_path, model_path, sentence_model_path, input_columns_n
         # Generate batch results
         outputs = model.generate(
             **inputs,
-            max_new_tokens=23,  # 控制生成的最大token数量，而不是总长度
+            max_new_tokens=23,  
             pad_token_id=tokenizer.eos_token_id,
             use_cache=False
         )
@@ -132,9 +132,8 @@ def main(train_path, test_path, model_path, sentence_model_path, input_columns_n
             elif key == 'Location':
                 prefix = 'L'
             else:
-                continue  # 跳过未知类型
+                continue  
 
-            # 为每个值添加前缀
             for v in values:
                 if v:  # 忽略空值
                     result_last.append(f"{prefix}-{v}")
@@ -206,9 +205,7 @@ if __name__ == '__main__':
     }
     task_names = ["ner"]
     model_names = ['gpt2']
-    seeds = [1, 43, 666]
-    # set the model and dataset path
-    # model_dir = 'C:\\Users\\bort\\.cache\\huggingface\\transformers\\'
+    seeds = [43]
     model_dir = '/root/autodl-tmp/huggingface/transformers/'
     sentence_transformer_path = '/root/autodl-tmp/huggingface/transformers/all-mpnet-base-v2'
     data_dir = ''
@@ -236,3 +233,4 @@ if __name__ == '__main__':
                 main(train_path, test_path, model_path, sentence_model_path,
                      input_columns[task_name], output_columns[task_name], ice_num, candidate_num, select_time,
                      batch_size, seed, output_json_filepath)
+
