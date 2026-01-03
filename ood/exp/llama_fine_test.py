@@ -1,18 +1,3 @@
-# from transformers import AutoTokenizer, AutoModelForCausalLM
-#
-# model_name = "/root/autodl-tmp/meta-llama/llama3-sentiment"
-# tokenizer = AutoTokenizer.from_pretrained(model_name)
-# model = AutoModelForCausalLM.from_pretrained(model_name)
-#
-# model.eval()
-#
-#
-# input_text = "This Hewlett Packard cartridge works fine, as has all previous same cartridges. I've always picked genuine catridges for all my printers"
-# inputs = tokenizer(input_text, return_tensors="pt").to(model.device)
-#
-# output = model.generate(**inputs, max_new_tokens=50)
-# print(tokenizer.decode(output[0], skip_special_tokens=True))
-#
 import torch as torch
 from sklearn.metrics import accuracy_score, f1_score
 from transformers import LlamaForCausalLM, AutoTokenizer, GPT2Tokenizer, GPT2LMHeadModel, AutoModelForCausalLM
@@ -21,28 +6,8 @@ import json
 from transformers import LogitsProcessorList, MinLengthLogitsProcessor
 from peft import LoraConfig, get_peft_model, PeftModel
 
-# 加载模型和tokenizer
-# model = AutoModelForCausalLM.from_pretrained("/root/autodl-fs/google/gemma-2-2b-sentiment").cuda()
-# tokenizer = AutoTokenizer.from_pretrained("/root/autodl-fs/google/gemma-2-2b-sentiment")
 model = AutoModelForCausalLM.from_pretrained("/root/autodl-fs/transformer/pythia-2.8b-toxic", torch_dtype=torch.float16, trust_remote_code=True).cuda()
-# model = AutoModelForCausalLM.from_pretrained("/root/autodl-fs/Qwen/Qwen2.5-7B-Instruct").cuda()
 tokenizer = AutoTokenizer.from_pretrained("/root/autodl-fs/transformer/pythia-2.8b-toxic")
-
-# model = AutoModelForCausalLM.from_pretrained("/root/autodl-fs/transformer/gpt2-xl-ner").cuda()
-# tokenizer = AutoTokenizer.from_pretrained("/root/autodl-fs/transformer/gpt2-xl-ner")
-# model = AutoModelForCausalLM.from_pretrained("/root/autodl-fs/transformer/Qwen3-4B").cuda()
-# tokenizer = AutoTokenizer.from_pretrained("/root/autodl-fs/transformer/Qwen3-4B")
-
-# MODEL_NAME = "/root/autodl-fs/transformer/gpt2-xl"
-#
-# # ✅ 加载tokenizer和模型
-# tokenizer = GPT2Tokenizer.from_pretrained(MODEL_NAME)
-# tokenizer.pad_token = tokenizer.eos_token
-#
-# model = GPT2LMHeadModel.from_pretrained(MODEL_NAME, torch_dtype=torch.float16).cuda()
-# #
-# base_model = LlamaForCausalLM.from_pretrained("/root/autodl-tmp/meta-llama/llama3-sentiment").cuda()
-# model = PeftModel.from_pretrained(base_model, "/root/autodl-tmp/meta-llama/llama3-sentiment/lora_adapter").cuda()
 
 # 确保pad_token设置正确
 if tokenizer.pad_token is None:
@@ -51,10 +16,7 @@ model.config.pad_token_id = tokenizer.pad_token_id
 
 # 加载测试数据
 with open(
-        # '/root/autodl-tmp/llm_code/revisit_demon_selection_in_ICL-main/exp/NameEntityRecognition/wnut/test.jsonl',
-        # '/root/autodl-tmp/llm_code/revisit_demon_selection_in_ICL-main/exp/NaturalLanguageInference/anli/test_select.jsonl',
-         '/root/autodl-tmp/llm_code/revisit_demon_selection_in_ICL-main/exp/ToxicDetection/implicit_hate/test.jsonl',
-        # '/root/autodl-tmp/llm_code/revisit_demon_selection_in_ICL-main/exp/classification/SentimentAnalysis/sst5/test_filtered.jsonl',
+         'test.jsonl',
         'r', encoding='utf-8') as f:
     test_data = [json.loads(line) for line in f]
 
@@ -67,16 +29,7 @@ for example in tqdm(test_data, desc="Generating Predictions"):
     input_text = f"Solve the toxic detection task. Options for toxicity: benign, toxic. \nText: {example['Text']} Prediction:"
     # input_text = f"Solve the NER task, identifying the Organization, Person, Location entities from given text.\nText: {example['Text']} // Entity:"
     inputs = tokenizer(input_text, return_tensors="pt").to("cuda")
-
-    # 修改后的generate调用
-    # outputs = model.generate(
-    #      ** inputs,
-    #      max_new_tokens = 3,
-    #      pad_token_id = tokenizer.pad_token_id,
-    #      eos_token_id = tokenizer.eos_token_id,
-    #      do_sample=False,
-    #      # use_cache=False
-    # )
+    
     outputs = model.generate(
         **inputs,
         max_new_tokens=10,
@@ -142,12 +95,3 @@ print(accuracy)
 f1 = f1_score(labels, predictions, average='weighted')
 
 print(f"\nValid samples: {len(filtered_preds)}/{len(predictions)}")
-# print(f"Accuracy: {accuracy:.4f}, F1-score: {f1:.4f}")
-
-# import torch
-# from transformers import LlamaForCausalLM, AutoTokenizer
-#
-# model = LlamaForCausalLM.from_pretrained("/root/autodl-tmp/meta-llama/llama3-sentiment")
-# for name, _ in model.named_parameters():
-#     print(name)
-# print(model)
