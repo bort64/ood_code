@@ -1,15 +1,9 @@
 #  模型路径配置
 BASE_MODEL = "/gemma-2-2b"
 FINETUNED_MODEL = "/gemma-2-2b-ner"  # 替换为实际微调模型路径
-
-# 设置数据类型为 FP16
 torch_dtype = torch.float16
-
-# 加载GPT-2专用tokenizer（修改点2）
 tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL)
 tokenizer.pad_token = tokenizer.eos_token  # 显式设置pad_token
-
-# 加载预训练和微调模型（修改点3）
 model_pretrained = AutoModelForCausalLM.from_pretrained(BASE_MODEL, torch_dtype=torch.float16, trust_remote_code=True).cuda().eval()
 model_finetuned = AutoModelForCausalLM.from_pretrained(FINETUNED_MODEL, torch_dtype=torch.float16, trust_remote_code=True).cuda().eval()
 
@@ -59,5 +53,6 @@ print(results)
 with open(output_file, "w", encoding="utf-8") as f:
     for result in results:
         f.write(json.dumps(result, ensure_ascii=False) + "\n")
+
 
 print(f"OOD scores saved to: {output_file}")
