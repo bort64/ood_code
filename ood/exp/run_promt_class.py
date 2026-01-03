@@ -19,7 +19,7 @@ file_path = '/wanli/qwen_mashi_sim3_ood300.jsonl'
 with open(file_path, 'r', encoding='utf-8') as f:
     g_ice_idx_list = json.load(f)
 
-model_name = "/root/autodl-fs/transformer/Qwen3-1.7B"
+model_name = "Qwen3-1.7B"
 tokenizer = AutoTokenizer.from_pretrained(model_name,padding_side='left')
 model = AutoModelForCausalLM.from_pretrained(model_name, ignore_mismatched_sizes=True).half()
 
@@ -234,7 +234,6 @@ if __name__ == '__main__':
                 # test_path = '/dynasent/test_filtered.jsonl'  # test_filtered
                 test_path = '/wanli/test_select.jsonl'
                 ice_num = 9
-                # output_json_filepath = '/root/autodl-tmp/llm_code/revisit_demon_selection_in_ICL-main/exp/ToxicDetection/civil_comments/result_sim2' + '/' + task_name
                 output_json_filepath = '/results/' + model_name + '/' + task_name
                 import os
 
@@ -248,3 +247,4 @@ if __name__ == '__main__':
                 main(templates[task_name], train_path, test_path, model_path, sentence_model_path,
                      input_columns[task_name], output_columns[task_name], ice_num, candidate_num, select_time,
                      batch_size, seed, output_json_filepath)
+
